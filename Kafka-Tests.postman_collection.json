@@ -1,0 +1,269 @@
+{
+  "info": {
+    "name": "Kafka Tests - Anti-Cheat System",
+    "description": "Collection complète de tests pour le système de détection avec Kafka",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Setup",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"auth_token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "admin",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}:8080/auth/login",
+              "host": ["{{base_url}}"],
+              "port": "8080",
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Create Profile - LegitPlayer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"LegitPlayer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8080/api/profils",
+              "host": ["{{base_url}}"],
+              "port": "8080",
+              "path": ["api", "profils"]
+            }
+          }
+        },
+        {
+          "name": "Create Profile - SuspectPlayer",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SuspectPlayer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8080/api/profils",
+              "host": ["{{base_url}}"],
+              "port": "8080",
+              "path": ["api", "profils"]
+            }
+          }
+        },
+        {
+          "name": "Create Profile - CheaterPro",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CheaterPro\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8080/api/profils",
+              "host": ["{{base_url}}"],
+              "port": "8080",
+              "path": ["api", "profils"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Logs Normaux (OK)",
+      "item": [
+        {
+          "name": "Normal - RIFLE distance 25",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-01\",\n  \"playerId\": \"1\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:RIFLE,distance:25\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        },
+        {
+          "name": "Normal - PISTOL distance 15",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-01\",\n  \"playerId\": \"2\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:PISTOL,distance:15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        },
+        {
+          "name": "Normal - KNIFE distance 2",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-02\",\n  \"playerId\": \"1\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:KNIFE,distance:2\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Logs Suspects (ALERT)",
+      "item": [
+        {
+          "name": "SUSPECT - KNIFE distance 50",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-01\",\n  \"playerId\": \"3\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:KNIFE,distance:50\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        },
+        {
+          "name": "SUSPECT - KNIFE distance 100",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-02\",\n  \"playerId\": \"3\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:KNIFE,distance:100\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        },
+        {
+          "name": "SUSPECT - KNIFE distance 75",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"game-server-01\",\n  \"playerId\": \"3\",\n  \"action\": \"KILL\",\n  \"metadata\": \"weapon:KNIFE,distance:75\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8082/api/ingest",
+              "host": ["{{base_url}}"],
+              "port": "8082",
+              "path": ["api", "ingest"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Verification",
+      "item": [
+        {
+          "name": "Get All Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}:8081/api/pilotage/alerts",
+              "host": ["{{base_url}}"],
+              "port": "8081",
+              "path": ["api", "pilotage", "alerts"]
+            }
+          }
+        },
+        {
+          "name": "Ban Cheater",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"3\",\n  \"reason\": \"Multiple knife cheat detection\",\n  \"adminUsername\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}:8081/api/pilotage/ban",
+              "host": ["{{base_url}}"],
+              "port": "8081",
+              "path": ["api", "pilotage", "ban"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
