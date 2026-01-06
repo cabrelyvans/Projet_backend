@@ -29,7 +29,8 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // ✅ OBLIGATOIRE
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/api/profils/**").authenticated()
                 .anyRequest().authenticated()
             )

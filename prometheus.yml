@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Profil Service (Port 8080)
+  - job_name: 'profil-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['profil-service:8080']
+        labels:
+          service: 'profil-service'
+          environment: 'development'
+
+  # Pilotage Service (Port 8081)
+  - job_name: 'pilotage-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['pilotage-service:8081']
+        labels:
+          service: 'pilotage-service'
+          environment: 'development'
+
+  # Ingestion Service (Port 8082)
+  - job_name: 'ingestion-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ingestion-service:8082']
+        labels:
+          service: 'ingestion-service'
+          environment: 'development'
+
+  # Detection Service (Port 8083)
+  - job_name: 'detection-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['detection-service:8083']
+        labels:
+          service: 'detection-service'
+          environment: 'development'
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
